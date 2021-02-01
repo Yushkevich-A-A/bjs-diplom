@@ -3,7 +3,7 @@
 const logoutButton = new LogoutButton();
 const ratesBoard = new RatesBoard();
 const moneyManager = new MoneyManager();
-const favoritesWidget = new FavoritesWidjet();
+const favoritesWidget = new FavoritesWidget();
 const minute = 60000;
 
 let messageSuccessfulDepositOfBalance = 'Пополнение баланса выполнено успешно';
@@ -18,6 +18,16 @@ function managerMessagesAndReloadModule (objectData, message) {
         moneyManager.setMessage(objectData.success, message)
     } else {
         moneyManager.setMessage(objectData.success, objectData.error);
+    }
+}
+
+// функция инициализация адресной книги
+
+function managerListAddressBook(data) {
+    if (data.success) {
+        favoritesWidget.clearTable();
+        favoritesWidget.fillTable(data.data);
+        moneyManager.updateUsersList(data.data);
     }
 }
 
@@ -50,7 +60,7 @@ ApiConnector.getStocks(objectData => {
 
 moneyManager.addMoneyCallback = data => {
     ApiConnector.addMoney(data, objectData => {
-        managerMessagesAndReloadModule(objectData, messageSuccessfulDepositOfBalance)
+        managerMessagesAndReloadModule(objectData, messageSuccessfulDepositOfBalance);
     });
 };
 
@@ -58,7 +68,7 @@ moneyManager.addMoneyCallback = data => {
 
 moneyManager.conversionMoneyCallback = data => {
     ApiConnector.convertMoney(data, objectData => {
-        managerMessagesAndReloadModule(objectData, messageSuccessfulConvertationOfValuence)
+        managerMessagesAndReloadModule(objectData, messageSuccessfulConvertationOfValuence);
     });
 };
 
@@ -66,8 +76,16 @@ moneyManager.conversionMoneyCallback = data => {
 
 moneyManager.sendMoneyCallback = data => {
     ApiConnector.transferMoney(data, objectData => {
-        managerMessagesAndReloadModule(objectData, messageSuccessfulTransferOfValuence)
+        managerMessagesAndReloadModule(objectData, messageSuccessfulTransferOfValuence);
     });
 };
 
-// 
+// Запрос начального списка избранного
+
+ApiConnector.getFavorites(data => managerListAddressBook(data));
+
+// Добавление пользователя в список избранных
+
+favoritesWidget.addUserCallback = data => {
+    ApiConnector.addUserToFavorites(data, responce => managerListAddressBook(responce));
+};
