@@ -9,6 +9,9 @@ const minute = 60000;
 let messageSuccessfulDepositOfBalance = 'Пополнение баланса выполнено успешно';
 let messageSuccessfulConvertationOfValuence = 'Конвертация валюты выполнена успешно';
 let messageSuccessfulTransferOfValuence = 'Отправка денег другому пользователю выполнена успешно';
+let messageSuccessfulAddUser = 'Пользователь успешно добавлен в список';
+let messageSuccessfulRemovaleUser = 'Пользователь успешно удален из списка';
+
 
 // функция вывода сообщения об успехе или ошибке и обновления данных
 
@@ -23,12 +26,13 @@ function managerMessagesAndReloadModule (objectData, message) {
 
 // функция инициализация адресной книги
 
-function managerListAddressBook(data) {
+function managerListAddressBook(data, message) {
     if (data.success) {
         favoritesWidget.clearTable();
         favoritesWidget.fillTable(data.data);
         moneyManager.updateUsersList(data.data);
     }
+    favoritesWidget.setMessage(data.success, message);
 }
 
 // Выход из учетной записи по кнопке выход
@@ -55,8 +59,7 @@ ApiConnector.getStocks(objectData => {
     setInterval(() => getRates(), minute);
 });
 
-// Операции с деньгами, пополнение баланса ??? непонятно почему после запроса внесения суммы на счет 
-// для оторажения информации должно пройти 500-1000мс
+// Операции с деньгами, пополнение баланса
 
 moneyManager.addMoneyCallback = data => {
     ApiConnector.addMoney(data, objectData => {
@@ -87,5 +90,17 @@ ApiConnector.getFavorites(data => managerListAddressBook(data));
 // Добавление пользователя в список избранных
 
 favoritesWidget.addUserCallback = data => {
-    ApiConnector.addUserToFavorites(data, responce => managerListAddressBook(responce));
+    ApiConnector.addUserToFavorites(data, response => {
+        if (response.success) {
+            managerListAddressBook(response, messageSuccessfulAddUser);
+        } else {
+            managerListAddressBook(response, response.error);
+        }
+    });
 };
+
+// Удаление пользователя из списка
+
+favoritesWidget.removeUserCallback = data => {
+    ApiConnector.removeUserFromFavorites(data, response => managerListAddressBook(response, messageSuccessfulRemovaleUser));
+}
