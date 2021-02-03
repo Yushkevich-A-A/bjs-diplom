@@ -35,6 +35,16 @@ function managerListAddressBook(data, message) {
     favoritesWidget.setMessage(data.success, message);
 }
 
+// функция Обновление и отображение курса валют
+
+function getRates() {
+    ApiConnector.getStocks(objectData => {
+        ratesBoard.clearTable();
+        ratesBoard.fillTable(objectData.data);
+        console.log(objectData.data);
+    });
+}
+
 // Выход из учетной записи по кнопке выход
 
 logoutButton.action = () => ApiConnector.logout(() => location.reload());
@@ -44,14 +54,6 @@ logoutButton.action = () => ApiConnector.logout(() => location.reload());
 ApiConnector.current(objectData => ProfileWidget.showProfile(objectData.data));
 
 // Обновление и отображение курса валют
-
-function getRates() {
-    ApiConnector.getStocks(objectData => {
-        ratesBoard.clearTable();
-        ratesBoard.fillTable(objectData.data);
-        console.log(objectData.data);
-    });
-}
 
 getRates();
 
