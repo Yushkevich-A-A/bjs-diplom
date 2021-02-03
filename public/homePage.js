@@ -15,10 +15,10 @@ let messageSuccessfulRemovaleUser = 'Пользователь успешно у�
 
 // функция вывода сообщения об успехе или ошибке и обновления данных
 
-function managerMessagesAndReloadModule (objectData, message) {
+function managerMessagesAndReloadModule(objectData, message) {
     if (objectData.success) {
-        setTimeout(() => resetCurrentUserDate(), 500);
-        moneyManager.setMessage(objectData.success, message)
+        ProfileWidget.showProfile(objectData.data);
+        moneyManager.setMessage(objectData.success, message);
     } else {
         moneyManager.setMessage(objectData.success, objectData.error);
     }
@@ -39,25 +39,23 @@ function managerListAddressBook(data, message) {
 
 logoutButton.action = () => ApiConnector.logout(() => location.reload());
 
-// Отображение данных профиля
+// Отображение текущих данных профиля
 
-let resetCurrentUserDate = () => {
-    ApiConnector.current(objectProfileData => {
-        ProfileWidget.showProfile(objectProfileData.data)
-    });
-};
-resetCurrentUserDate();
+ApiConnector.current(objectData => ProfileWidget.showProfile(objectData.data));
 
 // Обновление и отображение курса валют
 
-ApiConnector.getStocks(objectData => {
-    const getRates = () => {
+function getRates() {
+    ApiConnector.getStocks(objectData => {
         ratesBoard.clearTable();
         ratesBoard.fillTable(objectData.data);
-    };
-    getRates();
-    setInterval(() => getRates(), minute);
-});
+        console.log(objectData.data);
+    });
+}
+
+getRates();
+
+let timerGetStocks = setInterval(getRates, minute);
 
 // Операции с деньгами, пополнение баланса
 
