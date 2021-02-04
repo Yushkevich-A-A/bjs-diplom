@@ -43,7 +43,6 @@ function getRates() {
     ApiConnector.getStocks(objectData => {
         ratesBoard.clearTable();
         ratesBoard.fillTable(objectData.data);
-        console.log(objectData.data);
     });
 }
 
