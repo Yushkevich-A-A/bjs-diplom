@@ -31,8 +31,10 @@ function managerListAddressBook(data, message) {
         favoritesWidget.clearTable();
         favoritesWidget.fillTable(data.data);
         moneyManager.updateUsersList(data.data);
+        favoritesWidget.setMessage(data.success, message);
+    } else {
+        favoritesWidget.setMessage(data.success, objectData.error);
     }
-    favoritesWidget.setMessage(data.success, message);
 }
 
 // функция Обновление и отображение курса валют
@@ -90,13 +92,7 @@ ApiConnector.getFavorites(data => managerListAddressBook(data));
 // Добавление пользователя в список избранных
 
 favoritesWidget.addUserCallback = data => {
-    ApiConnector.addUserToFavorites(data, response => {
-        if (response.success) {
-            managerListAddressBook(response, messageSuccessfulAddUser);
-        } else {
-            managerListAddressBook(response, response.error);
-        }
-    });
+    ApiConnector.addUserToFavorites(data, response => managerListAddressBook(response, messageSuccessfulAddUser));
 };
 
 // Удаление пользователя из списка
