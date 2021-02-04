@@ -33,7 +33,7 @@ function managerListAddressBook(data, message) {
         moneyManager.updateUsersList(data.data);
         favoritesWidget.setMessage(data.success, message);
     } else {
-        favoritesWidget.setMessage(data.success, objectData.error);
+        favoritesWidget.setMessage(data.success, data.error);
     }
 }
 
@@ -87,7 +87,11 @@ moneyManager.sendMoneyCallback = data => {
 
 // Запрос начального списка избранного
 
-ApiConnector.getFavorites(data => managerListAddressBook(data));
+ApiConnector.getFavorites(data => {
+    favoritesWidget.clearTable();
+    favoritesWidget.fillTable(data.data);
+    moneyManager.updateUsersList(data.data);
+});
 
 // Добавление пользователя в список избранных
 
